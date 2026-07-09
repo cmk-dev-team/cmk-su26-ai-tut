@@ -1,0 +1,22 @@
+{
+    "name": "cmk-su26-ai-tut",
+    "version": "0.0.1",
+    "description": "CMK summer camp 2026 AI course MakeCode blocks",
+    "dependencies": {
+        "core": "*"
+    },
+    "files": [
+        "custom.ts",
+        "README.md"
+    ],
+    "public": true,
+    "targetVersions": {
+        "targetId": "minecraft",
+        "target": "2.1.27"
+    },
+    "supportedTargets": [
+        "minecraft"
+    ],
+    "preferredEditor": "tsprj",
+    "displayName": "CMK Summer Camp 2026 AI"
+}
