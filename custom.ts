@@ -88,7 +88,6 @@ namespace LearningBlocks {
     //% group="イベント"
     export function onLearning(handler: () => void): void {
         loops.runInBackground(function () {
-            sendAiEvent("learning_start")
             handler()
         })
     }
@@ -141,6 +140,7 @@ namespace ActionBlocks {
     export function onAction(handler: () => void): void {
         loops.runInBackground(function () {
             sendAiEvent("action_start")
+            loops.pause(200)
             handler()
         })
     }
