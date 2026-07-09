@@ -43,6 +43,44 @@ function particleKey(particle: AiParticle): string {
     return "none"
 }
 
+function itemKey(item: AiItem): string {
+    if (item == AiItem.BirchLog) {
+        return "birch_log"
+    } else if (item == AiItem.SpruceLog) {
+        return "spruce_log"
+    } else if (item == AiItem.JungleLog) {
+        return "jungle_log"
+    } else if (item == AiItem.AcaciaLog) {
+        return "acacia_log"
+    } else if (item == AiItem.Apple) {
+        return "apple"
+    } else if (item == AiItem.Steak) {
+        return "steak"
+    } else if (item == AiItem.CookedChicken) {
+        return "cooked_chicken"
+    } else if (item == AiItem.CookedMutton) {
+        return "cooked_mutton"
+    } else if (item == AiItem.CookedPorkchop) {
+        return "cooked_porkchop"
+    } else if (item == AiItem.Cake) {
+        return "cake"
+    } else if (item == AiItem.Cookie) {
+        return "cookie"
+    } else if (item == AiItem.Bread) {
+        return "bread"
+    }
+    return "oak_log"
+}
+
+function itemCategoryKey(category: AiItemCategory): string {
+    if (category == AiItemCategory.Food) {
+        return "food"
+    } else if (category == AiItemCategory.Creature) {
+        return "creature"
+    }
+    return "wood"
+}
+
 enum AiCreature {
     //% block="ウシ"
     Cow = 0,
@@ -80,8 +118,46 @@ enum AiParticle {
     Spark = 4
 }
 
+enum AiItem {
+    //% block="オークの原木"
+    OakLog = 0,
+    //% block="シラカバの原木"
+    BirchLog = 1,
+    //% block="トウヒの原木"
+    SpruceLog = 2,
+    //% block="ジャングルの原木"
+    JungleLog = 3,
+    //% block="アカシアの原木"
+    AcaciaLog = 4,
+    //% block="りんご"
+    Apple = 5,
+    //% block="ステーキ"
+    Steak = 6,
+    //% block="焼き鳥"
+    CookedChicken = 7,
+    //% block="焼いた羊肉"
+    CookedMutton = 8,
+    //% block="焼き豚"
+    CookedPorkchop = 9,
+    //% block="ケーキ"
+    Cake = 10,
+    //% block="クッキー"
+    Cookie = 11,
+    //% block="パン"
+    Bread = 12
+}
+
+enum AiItemCategory {
+    //% block="木材"
+    Wood = 0,
+    //% block="食べ物"
+    Food = 1,
+    //% block="生き物"
+    Creature = 2
+}
+
 //% color="#2F7D4E" weight=100 block="がくしゅう"
-//% groups='["イベント", "せってい", "がくしゅう", "しゅるい"]'
+//% groups='["イベント", "せってい", "がくしゅう", "ぶんるい", "パズル", "条件", "AI", "しゅるい"]'
 namespace LearningBlocks {
     //% blockId=cmkai_on_learning block="がくしゅうする"
     //% blockAllowMultiple=1
@@ -104,6 +180,55 @@ namespace LearningBlocks {
     //% group="がくしゅう"
     export function learnCreature(creature: AiCreature): void {
         sendAiEvent("learn_creature", creatureKey(creature))
+    }
+
+    //% blockId=cmkai_learn_item block="アイテム $item をがくしゅうする"
+    //% item.defl=AiItem.OakLog
+    //% group="がくしゅう"
+    export function learnItem(item: AiItem): void {
+        sendAiEvent("learn_item", itemKey(item))
+    }
+
+    //% blockId=cmkai_classify_items block="アイテムを $category にぶんるい"
+    //% category.defl=AiItemCategory.Wood
+    //% handlerStatement=1
+    //% group="ぶんるい"
+    export function classifyItems(category: AiItemCategory, handler: () => void): void {
+        sendAiEvent("learn_category", itemCategoryKey(category))
+        handler()
+    }
+
+    //% blockId=cmkai_collect_wood_puzzle block="木を集める"
+    //% group="パズル"
+    export function collectWoodPuzzle(): void {
+        sendAiEvent("collect_puzzle", "wood")
+    }
+
+    //% blockId=cmkai_collect_food_puzzle block="食べ物をあつめる"
+    //% group="パズル"
+    export function collectFoodPuzzle(): void {
+        sendAiEvent("collect_puzzle", "food")
+    }
+
+    //% blockId=cmkai_creature_was_found block="いきもの $creature をみつけた"
+    //% creature.defl=AiCreature.Cow
+    //% group="条件"
+    export function creatureWasFound(creature: AiCreature): boolean {
+        return player.execute("scoreboard players test @s ai_found_" + creatureKey(creature) + " 1 1")
+    }
+
+    //% blockId=cmkai_set_ai_speech block="AIにセリフ $message をせっていする"
+    //% message.defl="こんにちは"
+    //% group="AI"
+    export function setAiSpeech(message: string): void {
+        sendAiEvent("set_speech", message)
+    }
+
+    //% blockId=cmkai_set_ai_particle block="AIにパーティクルをせっていする $particle"
+    //% particle.defl=AiParticle.Heart
+    //% group="AI"
+    export function setAiParticle(particle: AiParticle): void {
+        sendAiEvent("set_particle", particleKey(particle))
     }
 
     //% blockId=cmkai_creature_cow block="ウシ"
@@ -132,7 +257,7 @@ namespace LearningBlocks {
 }
 
 //% color="#D56B2D" weight=99 block="じっこう"
-//% groups='["イベント", "さがす", "ゆうどう", "条件", "AI"]'
+//% groups='["イベント", "さがす", "ゆうどう", "条件"]'
 namespace ActionBlocks {
     //% blockId=cmkai_on_action block="じっこうする"
     //% blockAllowMultiple=1
@@ -178,46 +303,4 @@ namespace ActionBlocks {
         }
     }
 
-    //% blockId=cmkai_on_creature_found block="いきもの $creature をみつけたとき"
-    //% creature.defl=AiCreature.Cow
-    //% blockAllowMultiple=1
-    //% group="イベント"
-    export function onCreatureFound(creature: AiCreature, handler: () => void): void {
-        loops.runInBackground(function () {
-            let wasFound = false
-            while (true) {
-                sendAiEvent("scan_creature", creatureKey(creature))
-                loops.pause(100)
-
-                const found = creatureWasFound(creature)
-                if (found && !wasFound) {
-                    handler()
-                }
-                wasFound = found
-
-                loops.pause(250)
-            }
-        })
-    }
-
-    //% blockId=cmkai_creature_was_found block="いきもの $creature をみつけた"
-    //% creature.defl=AiCreature.Cow
-    //% group="条件"
-    export function creatureWasFound(creature: AiCreature): boolean {
-        return player.execute("scoreboard players test @s ai_found_" + creatureKey(creature) + " 1 1")
-    }
-
-    //% blockId=cmkai_set_ai_speech block="AIにセリフ $message をせっていする"
-    //% message.defl="こんにちは"
-    //% group="AI"
-    export function setAiSpeech(message: string): void {
-        sendAiEvent("set_speech", message)
-    }
-
-    //% blockId=cmkai_set_ai_particle block="AIにパーティクルをせっていする $particle"
-    //% particle.defl=AiParticle.Heart
-    //% group="AI"
-    export function setAiParticle(particle: AiParticle): void {
-        sendAiEvent("set_particle", particleKey(particle))
-    }
 }
