@@ -81,6 +81,25 @@ function itemCategoryKey(category: AiItemCategory): string {
     return "wood"
 }
 
+function foodKey(food: AiFood): string {
+    if (food == AiFood.Steak) {
+        return "steak"
+    } else if (food == AiFood.CookedChicken) {
+        return "cooked_chicken"
+    } else if (food == AiFood.CookedMutton) {
+        return "cooked_mutton"
+    } else if (food == AiFood.CookedPorkchop) {
+        return "cooked_porkchop"
+    } else if (food == AiFood.Cake) {
+        return "cake"
+    } else if (food == AiFood.Cookie) {
+        return "cookie"
+    } else if (food == AiFood.Bread) {
+        return "bread"
+    }
+    return "apple"
+}
+
 enum AiCreature {
     //% block="ウシ"
     Cow = 0,
@@ -156,6 +175,25 @@ enum AiItemCategory {
     Creature = 2
 }
 
+enum AiFood {
+    //% block="りんご"
+    Apple = 0,
+    //% block="ステーキ"
+    Steak = 1,
+    //% block="焼き鳥"
+    CookedChicken = 2,
+    //% block="焼いた羊肉"
+    CookedMutton = 3,
+    //% block="焼き豚"
+    CookedPorkchop = 4,
+    //% block="ケーキ"
+    Cake = 5,
+    //% block="クッキー"
+    Cookie = 6,
+    //% block="パン"
+    Bread = 7
+}
+
 //% color="#2F7D4E" weight=100 block="がくしゅう"
 //% groups='["イベント", "せってい", "がくしゅう", "ぶんるい", "パズル", "条件", "AI", "しゅるい"]'
 namespace LearningBlocks {
@@ -198,16 +236,29 @@ namespace LearningBlocks {
         handler()
     }
 
-    //% blockId=cmkai_collect_wood_puzzle block="木を集める"
+    //% blockId=cmkai_set_favorite_food block="すきなたべものを設定"
+    //% handlerStatement=1
     //% group="パズル"
-    export function collectWoodPuzzle(): void {
-        sendAiEvent("collect_puzzle", "wood")
+    export function setFavoriteFood(handler: () => void): void {
+        sendAiEvent("food_preference_mode", "favorite")
+        handler()
+        sendAiEvent("food_preference_mode", "none")
     }
 
-    //% blockId=cmkai_collect_food_puzzle block="食べ物をあつめる"
+    //% blockId=cmkai_set_disliked_food block="にがてなたべものを設定"
+    //% handlerStatement=1
     //% group="パズル"
-    export function collectFoodPuzzle(): void {
-        sendAiEvent("collect_puzzle", "food")
+    export function setDislikedFood(handler: () => void): void {
+        sendAiEvent("food_preference_mode", "disliked")
+        handler()
+        sendAiEvent("food_preference_mode", "none")
+    }
+
+    //% blockId=cmkai_food block="たべもの $food"
+    //% food.defl=AiFood.Apple
+    //% group="パズル"
+    export function food(food: AiFood): void {
+        sendAiEvent("food_preference_item", foodKey(food))
     }
 
     //% blockId=cmkai_creature_was_found block="いきもの $creature をみつけた"
