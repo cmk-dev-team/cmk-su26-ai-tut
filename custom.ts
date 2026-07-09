@@ -84,7 +84,7 @@ enum AiParticle {
 //% groups='["イベント", "せってい", "がくしゅう", "しゅるい"]'
 namespace LearningBlocks {
     //% blockId=cmkai_on_learning block="がくしゅうする"
-    //% handlerStatement=1
+    //% blockAllowMultiple=1
     //% group="イベント"
     export function onLearning(handler: () => void): void {
         loops.runInBackground(function () {
@@ -136,7 +136,7 @@ namespace LearningBlocks {
 //% groups='["イベント", "さがす", "ゆうどう", "条件", "AI"]'
 namespace ActionBlocks {
     //% blockId=cmkai_on_action block="じっこうする"
-    //% handlerStatement=1
+    //% blockAllowMultiple=1
     //% group="イベント"
     export function onAction(handler: () => void): void {
         loops.runInBackground(function () {
@@ -146,8 +146,8 @@ namespace ActionBlocks {
     }
 
     //% blockId=cmkai_on_command block="しじ $command をだしたとき"
-    //% command.defl="すすめ"
-    //% handlerStatement=1
+    //% command.defl="go"
+    //% blockAllowMultiple=1
     //% group="イベント"
     export function onCommand(command: string, handler: () => void): void {
         player.onChat(command, handler)
@@ -162,7 +162,7 @@ namespace ActionBlocks {
 
     //% blockId=cmkai_guide_creature block="いきもの $creature を $area にゆうどうする"
     //% creature.defl=AiCreature.Cow
-    //% area.defl=AiArea.Area1
+    //% area.defl=AiArea.Area0
     //% group="ゆうどう"
     export function guideCreature(creature: AiCreature, area: AiArea): void {
         sendAiEvent("guide_creature", creatureKey(creature) + "|" + areaKey(area))
@@ -176,6 +176,28 @@ namespace ActionBlocks {
         if (condition) {
             handler()
         }
+    }
+
+    //% blockId=cmkai_on_creature_found block="いきもの $creature をみつけたとき"
+    //% creature.defl=AiCreature.Cow
+    //% blockAllowMultiple=1
+    //% group="イベント"
+    export function onCreatureFound(creature: AiCreature, handler: () => void): void {
+        loops.runInBackground(function () {
+            let wasFound = false
+            while (true) {
+                sendAiEvent("scan_creature", creatureKey(creature))
+                loops.pause(100)
+
+                const found = creatureWasFound(creature)
+                if (found && !wasFound) {
+                    handler()
+                }
+                wasFound = found
+
+                loops.pause(250)
+            }
+        })
     }
 
     //% blockId=cmkai_creature_was_found block="いきもの $creature をみつけた"
