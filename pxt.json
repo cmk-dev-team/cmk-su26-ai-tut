@@ -1,6 +1,6 @@
 {
     "name": "cmk-su26-ai-tut",
-    "version": "0.0.6",
+    "version": "0.0.7",
     "description": "CMK summer camp 2026 AI course MakeCode blocks",
     "dependencies": {
         "core": "*"

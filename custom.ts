@@ -13,6 +13,12 @@ function creatureKey(creature: AiCreature): string {
         return "pig"
     } else if (creature == AiCreature.Chicken) {
         return "chicken"
+    } else if (creature == AiCreature.Fox) {
+        return "fox"
+    } else if (creature == AiCreature.Zombie) {
+        return "zombie"
+    } else if (creature == AiCreature.Villager) {
+        return "villager"
     }
     return "cow"
 }
@@ -100,6 +106,33 @@ function foodKey(food: AiFood): string {
     return "apple"
 }
 
+function aiRoleKey(role: AiRole): string {
+    if (role == AiRole.Supply) {
+        return "supply"
+    } else if (role == AiRole.Alert) {
+        return "alert"
+    }
+    return "defense"
+}
+
+function enemyActionKey(action: AiEnemyAction): string {
+    if (action == AiEnemyAction.Wall) {
+        return "wall"
+    } else if (action == AiEnemyAction.Alert) {
+        return "alert"
+    } else if (action == AiEnemyAction.None) {
+        return "none"
+    }
+    return "repel"
+}
+
+function supplyTargetKey(target: AiSupplyTarget): string {
+    if (target == AiSupplyTarget.Apple) {
+        return "apple"
+    }
+    return "wood"
+}
+
 enum AiCreature {
     //% block="ウシ"
     Cow = 0,
@@ -108,7 +141,13 @@ enum AiCreature {
     //% block="ブタ"
     Pig = 2,
     //% block="ニワトリ"
-    Chicken = 3
+    Chicken = 3,
+    //% block="キツネ"
+    Fox = 4,
+    //% block="ゾンビ"
+    Zombie = 5,
+    //% block="村人"
+    Villager = 6
 }
 
 enum AiArea {
@@ -194,6 +233,33 @@ enum AiFood {
     Bread = 7
 }
 
+enum AiRole {
+    //% block="防衛"
+    Defense = 0,
+    //% block="補給"
+    Supply = 1,
+    //% block="お知らせ"
+    Alert = 2
+}
+
+enum AiEnemyAction {
+    //% block="追い払う"
+    Repel = 0,
+    //% block="壁をつくる"
+    Wall = 1,
+    //% block="危険を知らせる"
+    Alert = 2,
+    //% block="なにもしない"
+    None = 3
+}
+
+enum AiSupplyTarget {
+    //% block="木材"
+    Wood = 0,
+    //% block="りんご"
+    Apple = 1
+}
+
 //% color="#2F7D4E" weight=100 block="がくしゅう"
 //% groups='["イベント", "せってい", "がくしゅう", "ぶんるい", "パズル", "条件", "AI", "しゅるい"]'
 namespace LearningBlocks {
@@ -261,6 +327,49 @@ namespace LearningBlocks {
         sendAiEvent("food_preference_item", foodKey(food))
     }
 
+    //% blockId=cmkai_set_enemy_creature block="敵を設定"
+    //% handlerStatement=1
+    //% group="パズル"
+    export function setEnemyCreature(handler: () => void): void {
+        sendAiEvent("creature_role_mode", "enemy")
+        handler()
+        sendAiEvent("creature_role_mode", "none")
+    }
+
+    //% blockId=cmkai_set_friend_creature block="味方を設定"
+    //% handlerStatement=1
+    //% group="パズル"
+    export function setFriendCreature(handler: () => void): void {
+        sendAiEvent("creature_role_mode", "friend")
+        handler()
+        sendAiEvent("creature_role_mode", "none")
+    }
+
+    //% blockId=cmkai_puzzle_creature block="いきもの $creature"
+    //% creature.defl=AiCreature.Cow
+    //% group="パズル"
+    export function puzzleCreature(creature: AiCreature): void {
+        sendAiEvent("creature_role_item", creatureKey(creature))
+    }
+
+    //% blockId=cmkai_on_enemy_approached block="敵が近づいたとき"
+    //% blockAllowMultiple=1
+    //% group="パズル"
+    export function onEnemyApproached(handler: () => void): void {
+        loops.runInBackground(function () {
+            let wasNear = false
+            while (true) {
+                sendAiEvent("scan_enemy")
+                const isNear = player.execute("scoreboard players test @s ai_enemy_near 1 1")
+                if (isNear && !wasNear) {
+                    handler()
+                }
+                wasNear = isNear
+                loops.pause(500)
+            }
+        })
+    }
+
     //% blockId=cmkai_creature_was_found block="いきもの $creature をみつけた"
     //% creature.defl=AiCreature.Cow
     //% group="条件"
@@ -280,6 +389,27 @@ namespace LearningBlocks {
     //% group="AI"
     export function setAiParticle(particle: AiParticle): void {
         sendAiEvent("set_particle", particleKey(particle))
+    }
+
+    //% blockId=cmkai_set_ai_role block="AIの役割を $role にする"
+    //% role.defl=AiRole.Defense
+    //% group="AI"
+    export function setAiRole(role: AiRole): void {
+        sendAiEvent("set_role", aiRoleKey(role))
+    }
+
+    //% blockId=cmkai_set_enemy_action block="敵が近づいたときの動きを $action にする"
+    //% action.defl=AiEnemyAction.Repel
+    //% group="AI"
+    export function setEnemyAction(action: AiEnemyAction): void {
+        sendAiEvent("set_enemy_action", enemyActionKey(action))
+    }
+
+    //% blockId=cmkai_set_supply_target block="補給するものを $target にする"
+    //% target.defl=AiSupplyTarget.Wood
+    //% group="AI"
+    export function setSupplyTarget(target: AiSupplyTarget): void {
+        sendAiEvent("set_supply_target", supplyTargetKey(target))
     }
 
     //% blockId=cmkai_creature_cow block="ウシ"
@@ -305,6 +435,24 @@ namespace LearningBlocks {
     export function chicken(): AiCreature {
         return AiCreature.Chicken
     }
+
+    //% blockId=cmkai_creature_fox block="キツネ"
+    //% group="しゅるい"
+    export function fox(): AiCreature {
+        return AiCreature.Fox
+    }
+
+    //% blockId=cmkai_creature_zombie block="ゾンビ"
+    //% group="しゅるい"
+    export function zombie(): AiCreature {
+        return AiCreature.Zombie
+    }
+
+    //% blockId=cmkai_creature_villager block="村人"
+    //% group="しゅるい"
+    export function villager(): AiCreature {
+        return AiCreature.Villager
+    }
 }
 
 //% color="#D56B2D" weight=99 block="じっこう"
@@ -327,6 +475,12 @@ namespace ActionBlocks {
     //% group="イベント"
     export function onCommand(command: string, handler: () => void): void {
         player.onChat(command, handler)
+    }
+
+    //% blockId=cmkai_start_ai block="AIをスタートする"
+    //% group="イベント"
+    export function startAi(): void {
+        sendAiEvent("ai_start")
     }
 
     //% blockId=cmkai_find_creature block="いきもの $creature をさがす"
