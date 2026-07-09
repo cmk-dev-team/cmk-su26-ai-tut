@@ -257,7 +257,7 @@ namespace LearningBlocks {
 }
 
 //% color="#D56B2D" weight=99 block="じっこう"
-//% groups='["イベント", "さがす", "ゆうどう", "条件"]'
+//% groups='["イベント", "さがす", "ゆうどう", "あつめる", "条件"]'
 namespace ActionBlocks {
     //% blockId=cmkai_on_action block="じっこうする"
     //% blockAllowMultiple=1
@@ -291,6 +291,19 @@ namespace ActionBlocks {
     //% group="ゆうどう"
     export function guideCreature(creature: AiCreature, area: AiArea): void {
         sendAiEvent("guide_creature", creatureKey(creature) + "|" + areaKey(area))
+    }
+
+    //% blockId=cmkai_collect_wood block="木材をあつめてもらう"
+    //% group="あつめる"
+    export function collectWood(): void {
+        sendAiEvent("collect_wood")
+    }
+
+    //% blockId=cmkai_collect_item block="アイテム $item をあつめてもらう"
+    //% item.defl=AiItem.Apple
+    //% group="あつめる"
+    export function collectItem(item: AiItem): void {
+        sendAiEvent("collect_item", itemKey(item))
     }
 
     //% blockId=cmkai_if block="もし $condition なら"
