@@ -49,6 +49,35 @@ function particleKey(particle: AiParticle): string {
     return "none"
 }
 
+function itemScoreId(item: AiItem): string {
+    if (item == AiItem.BirchLog) {
+        return "ai_i_birch"
+    } else if (item == AiItem.SpruceLog) {
+        return "ai_i_spruce"
+    } else if (item == AiItem.JungleLog) {
+        return "ai_i_jungle"
+    } else if (item == AiItem.AcaciaLog) {
+        return "ai_i_acacia"
+    } else if (item == AiItem.Apple) {
+        return "ai_i_apple"
+    } else if (item == AiItem.Steak) {
+        return "ai_i_steak"
+    } else if (item == AiItem.CookedChicken) {
+        return "ai_i_chicken"
+    } else if (item == AiItem.CookedMutton) {
+        return "ai_i_mutton"
+    } else if (item == AiItem.CookedPorkchop) {
+        return "ai_i_pork"
+    } else if (item == AiItem.Cake) {
+        return "ai_i_cake"
+    } else if (item == AiItem.Cookie) {
+        return "ai_i_cookie"
+    } else if (item == AiItem.Bread) {
+        return "ai_i_bread"
+    }
+    return "ai_i_oak"
+}
+
 function itemKey(item: AiItem): string {
     if (item == AiItem.BirchLog) {
         return "birch_log"
@@ -377,6 +406,34 @@ namespace LearningBlocks {
         return player.execute("scoreboard players test @s ai_found_" + creatureKey(creature) + " 1 1")
     }
 
+    //% blockId=cmkai_creature_is_known block="いきもの $creature をがくしゅうずみである"
+    //% creature.defl=AiCreature.Cow
+    //% group="条件"
+    export function creatureIsKnown(creature: AiCreature): boolean {
+        return player.execute("scoreboard players test @s ai_known_" + creatureKey(creature) + " 1 1")
+    }
+
+    //% blockId=cmkai_item_is_known block="アイテム $item をがくしゅうずみである"
+    //% item.defl=AiItem.OakLog
+    //% group="条件"
+    export function itemIsKnown(item: AiItem): boolean {
+        return player.execute("scoreboard players test @s " + itemScoreId(item) + " 1 1")
+    }
+
+    //% blockId=cmkai_creature_is_enemy block="いきもの $creature が敵として設定されている"
+    //% creature.defl=AiCreature.Zombie
+    //% group="条件"
+    export function creatureIsEnemy(creature: AiCreature): boolean {
+        return player.execute("scoreboard players test @s ai_enemy_" + creatureKey(creature) + " 1 1")
+    }
+
+    //% blockId=cmkai_creature_is_friend block="いきもの $creature が味方として設定されている"
+    //% creature.defl=AiCreature.Cow
+    //% group="条件"
+    export function creatureIsFriend(creature: AiCreature): boolean {
+        return player.execute("scoreboard players test @s ai_friend_" + creatureKey(creature) + " 1 1")
+    }
+
     //% blockId=cmkai_set_ai_speech block="AIにセリフ $message をせっていする"
     //% message.defl="こんにちは"
     //% group="AI"
@@ -519,6 +576,35 @@ namespace ActionBlocks {
         if (condition) {
             handler()
         }
+    }
+
+    //% blockId=cmkai_enemy_count_at_least block="近くの敵が $count 匹いじょういる"
+    //% count.defl=1
+    //% group="条件"
+    export function enemyCountAtLeast(count: number): boolean {
+        return player.execute("scoreboard players test @s ai_enemy_count " + count + " 2147483647")
+    }
+
+    //% blockId=cmkai_health_at_most block="たいりょくが $health いかである"
+    //% health.defl=10
+    //% group="条件"
+    export function healthAtMost(health: number): boolean {
+        return player.execute("scoreboard players test @s ai_health 0 " + health)
+    }
+
+    //% blockId=cmkai_is_night block="いまはよるである"
+    //% group="条件"
+    export function isNight(): boolean {
+        return player.execute("scoreboard players test @s ai_is_night 1 1")
+    }
+
+    //% blockId=cmkai_agent_item_count_at_least block="Agentが $item を $count こ いじょうもっている"
+    //% item.defl=AiItem.OakLog
+    //% count.defl=1
+    //% group="条件"
+    export function agentItemCountAtLeast(item: AiItem, count: number): boolean {
+        sendAiEvent("scan_agent_item", itemKey(item))
+        return player.execute("scoreboard players test @s ai_agent_" + itemKey(item) + " " + count + " 2147483647")
     }
 
 }
