@@ -1,7 +1,7 @@
 const aiActionHandlers: { [name: string]: () => void } = {}
 
 function debugSay(message: string): void {
-    player.execute("say [DEBUG] " + message)
+    player.execute("say DEBUG_" + message)
 }
 
 function sendAiEvent(eventName: string, payload?: string): void {
