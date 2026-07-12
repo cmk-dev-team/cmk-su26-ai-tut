@@ -78,7 +78,7 @@ function hashActionName(name: string): string {
     for (let i = 0; i < name.length; i++) {
         hash = ((hash * 33) ^ name.charCodeAt(i)) >>> 0
     }
-    return hash.toString(36)
+    return "" + hash
 }
 
 function actionObjectiveId(name: string): string {
