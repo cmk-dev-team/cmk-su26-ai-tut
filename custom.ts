@@ -467,11 +467,11 @@ namespace ActionBlocks {
         sendAiEvent("find_block_group", name)
     }
 
-    //% blockId=cmkai_action_attack block="いきもの $creature をこうげきする"
-    //% creature.defl=AiCreature.Zombie
-    //% group="こうどう"
-    export function actionAttack(creature: AiCreature): void {
-        sendAiEvent("attack_creature", creatureKey(creature))
+    //% blockId=cmkai_find_creature_group block="いきものグループ $name をさがす"
+    //% name.defl="かちく"
+    //% group="さがす"
+    export function findCreatureGroup(name: string): void {
+        sendAiEvent("find_creature_group", name)
     }
 
     //% blockId=cmkai_action_repel block="いきもの $creature をおいはらう"
@@ -479,6 +479,13 @@ namespace ActionBlocks {
     //% group="こうどう"
     export function actionRepel(creature: AiCreature): void {
         sendAiEvent("repel_creature", creatureKey(creature))
+    }
+
+    //% blockId=cmkai_repel_creature_group block="いきものグループ $name をおいはらう"
+    //% name.defl="かちく"
+    //% group="こうどう"
+    export function repelCreatureGroup(name: string): void {
+        sendAiEvent("repel_creature_group", name)
     }
 
     //% blockId=cmkai_guide_creature block="いきもの $creature をエリア $area へつれていく"
