@@ -291,10 +291,12 @@ namespace AiBlocks {
     //% blockId=cmkai_learn_action block="AIのきのう $name をつくる"
     //% name.defl="とくべつこうげき"
     //% handlerStatement=1
+    //% blockAllowMultiple=1
     //% group="きのう"
     export function learnAction(name: string, handler: () => void): void {
         aiActionHandlers[name] = handler
         sendAiEvent("learn_action", name)
+        sendAiEvent("set_action_enabled", name + "|on")
     }
 
     //% blockId=cmkai_run_action block="AIのきのう $name を実行する"
