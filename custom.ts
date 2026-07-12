@@ -1,7 +1,3 @@
-const aiActionHandlers: { [name: string]: () => void } = {}
-const registeredActionNames: string[] = []
-let autoRunStarted = false
-
 function sendAiEvent(eventName: string, payload?: string): void {
     if (payload && payload.length > 0) {
         player.execute("scriptevent cmk_ai:" + eventName + " " + payload)
@@ -91,13 +87,6 @@ function actionObjectiveId(name: string): string {
 
 function groupFoundObjectiveId(domain: string, name: string): string {
     return "ai_grpfound_" + domain + "_" + hashActionName(name)
-}
-
-function registerAction(name: string, handler: () => void): void {
-    if (aiActionHandlers[name] == null) {
-        registeredActionNames.push(name)
-    }
-    aiActionHandlers[name] = handler
 }
 
 enum AiCreature {
@@ -214,14 +203,6 @@ namespace LearningBlocks {
         sendAiEvent("set_name", name)
     }
 
-    //% blockId=cmkai_set_area_coords block="座標 x $x, y $y, z $z をエリア $area にせっていする"
-    //% x.defl=0 y.defl=64 z.defl=0
-    //% area.defl=AiArea.Area1
-    //% group="せってい"
-    export function setAreaCoords(x: number, y: number, z: number, area: AiArea): void {
-        sendAiEvent("set_area_coords", area + "|" + x + "|" + y + "|" + z)
-    }
-
     //% blockId=cmkai_set_area_self block="自分の座標をエリア $area にせっていする"
     //% area.defl=AiArea.Area1
     //% group="せってい"
@@ -308,10 +289,18 @@ namespace AiBlocks {
     //% blockId=cmkai_learn_action block="AIのきのう $name をつくる"
     //% name.defl="とくべつこうげき"
     //% handlerStatement=1
+    //% blockAllowMultiple=1
     //% group="きのう"
     export function learnAction(name: string, handler: () => void): void {
-        registerAction(name, handler)
         sendAiEvent("learn_action", name)
+        loops.runInBackground(function () {
+            while (true) {
+                if (player.execute("scoreboard players test @s " + actionObjectiveId(name) + " 1 1")) {
+                    handler()
+                }
+                loops.pause(20)
+            }
+        })
     }
 
     //% blockId=cmkai_set_ai_speech block="AIにセリフ $message をせっていする"
@@ -400,24 +389,13 @@ namespace ExecBlocks {
     }
 
     //% blockId=cmkai_auto_run block="じどうでじっこうする"
+    //% handlerStatement=1
+    //% blockAllowMultiple=1
     //% group="イベント"
-    export function autoRunAll(): void {
-        if (autoRunStarted) {
-            return
-        }
-        autoRunStarted = true
-
+    export function autoRun(handler: () => void): void {
         loops.runInBackground(function () {
             while (true) {
-                for (let i = 0; i < registeredActionNames.length; i++) {
-                    const name = registeredActionNames[i]
-                    if (player.execute("scoreboard players test @s " + actionObjectiveId(name) + " 1 1")) {
-                        const handler = aiActionHandlers[name]
-                        if (handler) {
-                            handler()
-                        }
-                    }
-                }
+                handler()
                 loops.pause(20)
             }
         })
