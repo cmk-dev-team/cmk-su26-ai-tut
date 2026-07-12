@@ -1,5 +1,9 @@
 const aiActionHandlers: { [name: string]: () => void } = {}
 
+function debugSay(message: string): void {
+    player.execute("say [DEBUG] " + message)
+}
+
 function sendAiEvent(eventName: string, payload?: string): void {
     if (payload && payload.length > 0) {
         player.execute("scriptevent cmk_ai:" + eventName + " " + payload)
@@ -293,18 +297,24 @@ namespace AiBlocks {
     //% handlerStatement=1
     //% group="きのう"
     export function learnAction(name: string, handler: () => void): void {
+        debugSay("learnAction start " + name)
         aiActionHandlers[name] = handler
         sendAiEvent("learn_action", name)
+        debugSay("learnAction end " + name)
     }
 
     //% blockId=cmkai_run_action block="AIのきのう $name を実行する"
     //% name.defl="とくべつこうげき"
     //% group="きのう"
     export function runAction(name: string): void {
-        if (!player.execute("scoreboard players test @s " + actionObjectiveId(name) + " 1 1")) {
+        debugSay("runAction start " + name)
+        const enabled = player.execute("scoreboard players test @s " + actionObjectiveId(name) + " 1 1")
+        debugSay("runAction enabled=" + enabled + " objective=" + actionObjectiveId(name))
+        if (!enabled) {
             return
         }
         const handler = aiActionHandlers[name]
+        debugSay("runAction handlerExists=" + (handler != null))
         if (handler) {
             handler()
         }
@@ -392,7 +402,10 @@ namespace ExecBlocks {
     //% blockAllowMultiple=1
     //% group="イベント"
     export function onCommand(command: string, handler: () => void): void {
-        player.onChat(command, handler)
+        player.onChat(command, function () {
+            debugSay("onCommand fired " + command)
+            handler()
+        })
     }
 
     //% blockId=cmkai_auto_run block="じどうでじっこうする"
@@ -400,7 +413,9 @@ namespace ExecBlocks {
     //% blockAllowMultiple=1
     //% group="イベント"
     export function autoRun(handler: () => void): void {
+        debugSay("autoRun registered")
         loops.runInBackground(function () {
+            debugSay("autoRun loop entered")
             while (true) {
                 handler()
                 loops.pause(20)
@@ -413,6 +428,7 @@ namespace ExecBlocks {
     //% enabled.defl=AiToggle.On
     //% group="せってい"
     export function setActionEnabled(name: string, enabled: AiToggle): void {
+        debugSay("setActionEnabled " + name + " " + (enabled == AiToggle.On ? "on" : "off"))
         sendAiEvent("set_action_enabled", name + "|" + (enabled == AiToggle.On ? "on" : "off"))
     }
 }
