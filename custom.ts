@@ -236,7 +236,7 @@ namespace LearningBlocks {
 
     //% blockId=cmkai_learn_creature_group block="いきものグループ $name をつくる"
     //% name.defl="かちく"
-    //% handlerStatement=1
+    //% blockAllowMultiple=1
     //% group="グループ"
     export function createCreatureGroup(name: string, handler: () => void): void {
         sendAiEvent("group_context_start", "creature|" + name)
@@ -246,7 +246,7 @@ namespace LearningBlocks {
 
     //% blockId=cmkai_learn_item_group block="アイテムグループ $name をつくる"
     //% name.defl="たべもの"
-    //% handlerStatement=1
+    //% blockAllowMultiple=1
     //% group="グループ"
     export function createItemGroup(name: string, handler: () => void): void {
         sendAiEvent("group_context_start", "item|" + name)
@@ -256,7 +256,7 @@ namespace LearningBlocks {
 
     //% blockId=cmkai_learn_block_group block="ブロックグループ $name をつくる"
     //% name.defl="もくざい"
-    //% handlerStatement=1
+    //% blockAllowMultiple=1
     //% group="グループ"
     export function createBlockGroup(name: string, handler: () => void): void {
         sendAiEvent("group_context_start", "block|" + name)
