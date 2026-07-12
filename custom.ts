@@ -453,6 +453,20 @@ namespace ActionBlocks {
         sendAiEvent("find_item", itemKey(item))
     }
 
+    //% blockId=cmkai_find_item_group block="アイテムグループ $name をさがす"
+    //% name.defl="たべもの"
+    //% group="さがす"
+    export function findItemGroup(name: string): void {
+        sendAiEvent("find_item_group", name)
+    }
+
+    //% blockId=cmkai_find_block_group block="ブロックグループ $name をさがす"
+    //% name.defl="もくざい"
+    //% group="さがす"
+    export function findBlockGroup(name: string): void {
+        sendAiEvent("find_block_group", name)
+    }
+
     //% blockId=cmkai_action_attack block="いきもの $creature をこうげきする"
     //% creature.defl=AiCreature.Zombie
     //% group="こうどう"
@@ -487,6 +501,20 @@ namespace ActionBlocks {
     //% group="あつめる"
     export function collectItem(item: AiItem): void {
         sendAiEvent("collect_item", itemKey(item))
+    }
+
+    //% blockId=cmkai_collect_item_group block="アイテムグループ $name をあつめる"
+    //% name.defl="たべもの"
+    //% group="あつめる"
+    export function collectItemGroup(name: string): void {
+        sendAiEvent("collect_item_group", name)
+    }
+
+    //% blockId=cmkai_collect_block_group block="ブロックグループ $name をあつめる"
+    //% name.defl="もくざい"
+    //% group="あつめる"
+    export function collectBlockGroup(name: string): void {
+        sendAiEvent("collect_block_group", name)
     }
 
     //% blockId=cmkai_action_wall block="AIエージェントの $direction に $material ブロックでかべをつくる"
