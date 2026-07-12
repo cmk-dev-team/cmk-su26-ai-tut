@@ -350,7 +350,7 @@ namespace AiBlocks {
         return player.execute("scoreboard players test @s ai_foundblock_" + blockKey(block) + " 1 1")
     }
 
-    //% blockId=cmkai_item_group_found block="アイテムグループ $name にいっちする"
+    //% blockId=cmkai_item_group_found block="アイテムグループ $name をみつけた"
     //% name.defl="たべもの"
     //% group="じょうけん"
     export function itemGroupFound(name: string): boolean {
@@ -358,7 +358,7 @@ namespace AiBlocks {
         return player.execute("scoreboard players test @s " + groupFoundObjectiveId("item", name) + " 1 1")
     }
 
-    //% blockId=cmkai_creature_group_found block="いきものグループ $name にいっちする"
+    //% blockId=cmkai_creature_group_found block="いきものグループ $name をみつけた"
     //% name.defl="かちく"
     //% group="じょうけん"
     export function creatureGroupFound(name: string): boolean {
@@ -366,7 +366,7 @@ namespace AiBlocks {
         return player.execute("scoreboard players test @s " + groupFoundObjectiveId("creature", name) + " 1 1")
     }
 
-    //% blockId=cmkai_block_group_found block="ブロックグループ $name にいっちする"
+    //% blockId=cmkai_block_group_found block="ブロックグループ $name をみつけた"
     //% name.defl="もくざい"
     //% group="じょうけん"
     export function blockGroupFound(name: string): boolean {
