@@ -1,4 +1,5 @@
 const aiActionHandlers: { [name: string]: () => void } = {}
+const registeredCommands: { [command: string]: boolean } = {}
 
 function sendAiEvent(eventName: string, payload?: string): void {
     if (payload && payload.length > 0) {
@@ -290,7 +291,6 @@ namespace LearningBlocks {
 namespace AiBlocks {
     //% blockId=cmkai_learn_action block="AIのきのう $name をつくる"
     //% name.defl="とくべつこうげき"
-    //% handlerStatement=1
     //% blockAllowMultiple=1
     //% group="きのう"
     export function learnAction(name: string, handler: () => void): void {
@@ -394,6 +394,10 @@ namespace ExecBlocks {
     //% blockAllowMultiple=1
     //% group="イベント"
     export function onCommand(command: string, handler: () => void): void {
+        if (registeredCommands[command]) {
+            return
+        }
+        registeredCommands[command] = true
         player.onChat(command, handler)
     }
 
