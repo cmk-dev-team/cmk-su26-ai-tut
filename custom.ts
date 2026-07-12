@@ -1,3 +1,5 @@
+const aiActionHandlers: { [name: string]: () => void } = {}
+
 function sendAiEvent(eventName: string, payload?: string): void {
     if (payload && payload.length > 0) {
         player.execute("scriptevent cmk_ai:" + eventName + " " + payload)
@@ -289,18 +291,23 @@ namespace AiBlocks {
     //% blockId=cmkai_learn_action block="AIのきのう $name をつくる"
     //% name.defl="とくべつこうげき"
     //% handlerStatement=1
-    //% blockAllowMultiple=1
     //% group="きのう"
     export function learnAction(name: string, handler: () => void): void {
+        aiActionHandlers[name] = handler
         sendAiEvent("learn_action", name)
-        loops.runInBackground(function () {
-            while (true) {
-                if (player.execute("scoreboard players test @s " + actionObjectiveId(name) + " 1 1")) {
-                    handler()
-                }
-                loops.pause(20)
-            }
-        })
+    }
+
+    //% blockId=cmkai_run_action block="AIのきのう $name を実行する"
+    //% name.defl="とくべつこうげき"
+    //% group="きのう"
+    export function runAction(name: string): void {
+        if (!player.execute("scoreboard players test @s " + actionObjectiveId(name) + " 1 1")) {
+            return
+        }
+        const handler = aiActionHandlers[name]
+        if (handler) {
+            handler()
+        }
     }
 
     //% blockId=cmkai_set_ai_speech block="AIにセリフ $message をせっていする"
